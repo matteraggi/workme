@@ -2,9 +2,14 @@ services:
   backend:
     build:
       context: ./backend
-      dockerfile: Dockerfile
-    container_name: workme-backend
-    env_file: ./backend/.env
+      dockerfile: Dockerfile.dev
+    command: npm run start:dev
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    environment:
+      DATABASE_URL: postgresql://postgres:pass@workme-db:5432/postgres?schema=public
+      JWT_SECRET: supersegreto
     ports:
       - "3000:3000"
     depends_on:
@@ -12,9 +17,6 @@ services:
 
   workme-db:
     image: postgres:15
-    container_name: workme-db
-    ports:
-      - "5432:5432"
     environment:
       POSTGRES_PASSWORD: pass
     volumes:

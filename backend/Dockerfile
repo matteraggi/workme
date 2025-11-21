@@ -3,9 +3,11 @@ FROM node:20 AS builder
 WORKDIR /app
 
 COPY package*.json ./
+COPY prisma ./prisma
+
 RUN npm install
 
-# Copy all files, including prisma.config.ts e prisma/
+# Copy all files
 COPY . .
 
 RUN npm run build
@@ -15,13 +17,12 @@ FROM node:20
 WORKDIR /app
 
 COPY package*.json ./
+COPY prisma ./prisma
+
 RUN npm install --only=production
+RUN npx prisma generate
 
 # Copy compiled output
 COPY --from=builder /app/dist ./dist
-
-# Copy Prisma schema, migrations, AND prisma.config.ts
-COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/prisma.config.ts ./prisma.config.ts
 
 CMD ["node", "dist/src/main.js"]

@@ -1,0 +1,20 @@
+FROM node:20
+
+# Dir di lavoro interna
+WORKDIR /app
+
+# Copia solo package.json per velocizzare i build
+COPY package*.json ./
+
+# Installa dipendenze
+RUN npm install
+
+# Copia Prisma e genera client
+COPY prisma ./prisma
+RUN npx prisma generate
+
+# Copia tutto il resto del codice
+COPY . .
+
+# Avvia Nest in modalità sviluppo (--watch)
+CMD ["npm", "run", "start:dev"]
